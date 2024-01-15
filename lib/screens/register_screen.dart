@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:prices_app/global/global.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -10,6 +11,19 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final nameController = TextEditingController();
+
+  final _formKey = GlobalKey<FormState>();
+
+  void _submit() async {
+    if(_formKey.currentState!.validate()) {
+      await firebaseAuth.createUserWithEmailAndPassword(
+          email: "test@test.com",
+          password: "password"
+      ).then((auth) async {
+        currentUser = auth.user;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +46,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
                 Form(
+                    key: _formKey,
                     child: Column(
                       children: [
                         TextField(
@@ -51,11 +66,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 width: 0,
                                 style: BorderStyle.none
                               )
-                            )
+                            ),
                           ),
+                          onChanged: (text) => setState(() {
+                            nameController.text = text;
+                          }),
+                        ),
+                        const SizedBox(height: 20,),
+                        ElevatedButton(
+                            onPressed: _submit,
+                            child: const Text(
+                              'Register',
+                              style: TextStyle(
+                                fontSize: 20
+                              ),
+                            )
                         )
                       ],
-                    )
+                    ),
                 )
               ],
             )
